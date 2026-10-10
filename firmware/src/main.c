@@ -43,6 +43,14 @@ int main(void) {
                     digitalWrite(LEDS[i], LOW);
                 }
 
+                long randomDelay = (rand() % 3001) + 2000;
+                delay(randomDelay);
+
+                for (int i = 0; i < LEDS_LENGTH; i++) {
+                    digitalWrite(LEDS[i], HIGH);
+                }
+                currentState = WAIT_FOR_REACTION;
+
                 break;
             }
             case WAIT_FOR_REACTION: {
