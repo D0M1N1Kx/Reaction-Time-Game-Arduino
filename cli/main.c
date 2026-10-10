@@ -93,6 +93,8 @@ int main() {
                 break;
             }
             case 4: {
+                savePlayers(players, playerCount);
+                running = 0;
                 break;
             }
             default:
