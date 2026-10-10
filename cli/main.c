@@ -64,6 +64,26 @@ int main() {
 
         switch (choice) {
             case 1: {
+                printf("\nSaved Players\n");
+                for (int i = 0; i < playerCount; i++) {
+                    printf("[%d] %s (%d measurement)", i, players[i].name, players[i].scoreCount);
+                }
+                printf("Select player (write last player index + 1 to create): ");
+
+                int pChoice;
+                scanf("%d", &pChoice);
+
+                if (pChoice == playerCount && playerCount < MAX_PLAYERS) {
+                    printf("\nNew player name: ");
+                    scanf("%39s", players[playerCount].name);
+                    players[playerCount].scoreCount = 0;
+                    activePlayerIndex = playerCount;
+                    playerCount++;
+                } else if (pChoice >= 0 && pChoice < playerCount) {
+                    activePlayerIndex = pChoice;
+                } else {
+                    printf("Invalid choice!\n");
+                }
                 break;
             }
             case 2: {
