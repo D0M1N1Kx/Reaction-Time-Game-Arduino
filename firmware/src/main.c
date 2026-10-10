@@ -22,6 +22,9 @@ int main(void) {
 
     pinMode(BUTTON_PIN, INPUT_PULLUP);
 
+    unsigned long startTime = 0;
+    unsigned long reactionTime = 0;
+
     while (true) {
         switch (currentState) {
             case WAIT_FOR_START: {
@@ -49,12 +52,17 @@ int main(void) {
                 for (int i = 0; i < LEDS_LENGTH; i++) {
                     digitalWrite(LEDS[i], HIGH);
                 }
+                startTime = millis();
+
                 currentState = WAIT_FOR_REACTION;
 
                 break;
             }
             case WAIT_FOR_REACTION: {
-                // START A TIMER AND WAIT FOR THE PLAYER TO PRESS THE BUTTON
+                if (digitalRead(BUTTON_PIN) == LOW) {
+                    reactionTime = millis() - startTime;
+                }
+
                 break;
             }
             case SHOW_RESULT: {
