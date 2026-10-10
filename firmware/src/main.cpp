@@ -13,8 +13,10 @@ typedef enum {
 
 GameState currentState = WAIT_FOR_START;
 
-int main(void) {
+int main() {
     init();
+
+    Serial.begin(9600);
 
     for (int i = 0; i < LEDS_LENGTH; i++) {
         pinMode(LEDS[i], OUTPUT);
@@ -61,12 +63,19 @@ int main(void) {
             case WAIT_FOR_REACTION: {
                 if (digitalRead(BUTTON_PIN) == LOW) {
                     reactionTime = millis() - startTime;
+                    currentState = SHOW_RESULT;
                 }
 
                 break;
             }
             case SHOW_RESULT: {
-                // SEND THE RESULT TO THE CONNECTED PC ON USB
+                Serial.print("Reaction time:");
+                Serial.println(reactionTime);
+
+                delay(2000);
+
+                currentState = WAIT_FOR_START;
+
                 break;
             }
             default:
