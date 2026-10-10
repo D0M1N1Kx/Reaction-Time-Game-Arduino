@@ -1,4 +1,8 @@
 #include <stdio.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <termios.h>
 #include "player.h"
 #include "reaction_record.h"
 
@@ -34,6 +38,36 @@ void savePlayers(Player players[], int playerCount) {
     printf("Datas saved successfully!\n");
 }
 
+// AI GENERATED FUNCTION
+int open_serial_port(const char *device_path) {
+    int fd = open(device_path, O_RDONLY | O_NOCTTY);
+    if (fd < 0) {
+        return -1;
+    }
+
+    struct termios tty;
+    if (tcgetattr(fd, &tty) != 0) {
+        close(fd);
+        return -1;
+    }
+
+    cfsetospeed(&tty, B9600);
+    cfsetispeed(&tty, B9600);
+
+    tty.c_cflag |= (CLOCAL | CREAD);
+    tty.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+
+    tty.c_cc[VMIN] = 1;
+    tty.c_cc[VTIME] = 0;
+
+    if (tcsetattr(fd, TCSANOW, &tty) != 0) {
+        close(fd);
+        return -1;
+    }
+
+    return fd;
+}
+
 int main() {
     Player players[MAX_PLAYERS];
     int playerCount = 0;
@@ -51,7 +85,7 @@ int main() {
         }
 
         printf("1. Select or create player\n");
-        printf("2. Start measurement (wait for USB)\n");
+        printf("2. Check last measurement\n");
         printf("3. Check player's records\n");
         printf("4. Save and exit\n");
         printf("Choice: ");
@@ -86,7 +120,69 @@ int main() {
                 }
                 break;
             }
+            // CASE 2 IS AI GENERATED
             case 2: {
+                if (activePlayerIndex == -1) {
+                    printf("No active player!\n");
+                    break;
+                }
+
+                printf("\nWait for Arduino (/dev/ttyACM0)...\n");
+
+                int fd = open_serial_port("/dev/ttyACM0");
+                if (fd < 0) {
+                    printf("Error: Failed to open port.\n");
+                    break;
+                }
+
+                usleep(2000000);
+
+                char read_buf[256];
+                int idx = 0;
+                char ch;
+
+                while (idx < sizeof(read_buf) - 1) {
+                    int n = read(fd, &ch, 1);
+                    if (n > 0) {
+                        if (ch == '\n' || ch == '\r') {
+                            if (idx > 0) break;
+                            continue;
+                        }
+                        read_buf[idx++] = ch;
+                    } else {
+                        break;
+                    }
+                }
+                read_buf[idx] = '\0';
+                close(fd);
+
+                if (idx > 0) {
+                    char *p = read_buf;
+                    while (*p && (*p < '0' || *p > '9')) {
+                        p++;
+                    }
+
+                    unsigned long incomingTime = 0;
+                    if (*p != '\0') {
+                        incomingTime = strtoul(p, NULL, 10);
+                    }
+
+                    if (incomingTime > 0) {
+                        int count = players[activePlayerIndex].scoreCount;
+                        if (count < 50) {
+                            players[activePlayerIndex].history[count].reactionTime = incomingTime;
+                            players[activePlayerIndex].history[count].timestamp = time(NULL);
+                            players[activePlayerIndex].scoreCount++;
+                            printf("Success! Fixed for the player: %lu ms\n", incomingTime);
+                        } else {
+                            printf("The player's reaction record's list is full!\n");
+                        }
+                    } else {
+                        printf("Invalid data: '%s'\n", read_buf);
+                    }
+                } else {
+                    printf("Data not arrived from the port.\n");
+                }
                 break;
             }
             case 3: {
