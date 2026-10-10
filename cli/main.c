@@ -85,7 +85,7 @@ int main() {
         }
 
         printf("1. Select or create player\n");
-        printf("2. Check last measurement\n");
+        printf("2. Start measurement (wait for USB)\n");
         printf("3. Check player's records\n");
         printf("4. Save and exit\n");
         printf("Choice: ");
