@@ -17,20 +17,32 @@ int main(void) {
     init();
 
     for (int i = 0; i < LEDS_LENGTH; i++) {
-        digitalWrite(LEDS[i], OUTPUT);
+        pinMode(LEDS[i], OUTPUT);
     }
 
-    digitalWrite(BUTTON_PIN, INPUT_PULLUP);
+    pinMode(BUTTON_PIN, INPUT_PULLUP);
 
     while (true) {
         switch (currentState) {
             case WAIT_FOR_START: {
                 // WAIT UNTIL THE PLAYER PRESS THE BUTTON TO START
+                for (int i = 0; i < LEDS_LENGTH; i++) {
+                    digitalWrite(LEDS[i], HIGH);
+                }
+
+                if (digitalRead(BUTTON_PIN) == LOW) {
+                    currentState = WAIT_FOR_STIMULUS;
+                }
+
                 break;
             }
             case WAIT_FOR_STIMULUS: {
                 // GENERATE RANDOM TIME BETWEEN 2-5s
                 // IF REACH THE GIVEN TIME THEN NEXT STATE
+                for (int i = 0; i < LEDS_LENGTH; i++) {
+                    digitalWrite(LEDS[i], LOW);
+                }
+
                 break;
             }
             case WAIT_FOR_REACTION: {
