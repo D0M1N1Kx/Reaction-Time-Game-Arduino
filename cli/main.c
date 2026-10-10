@@ -19,6 +19,21 @@ int loadPlayers(Player players[], int *playerCount) {
     return 1;
 }
 
+void savePlayers(Player players[], int playerCount) {
+    FILE *file = fopen("players_data.dat", "wb");
+
+    if (file == NULL) {
+        printf("Error when open file!\n");
+        return;
+    }
+
+    fwrite(&playerCount, sizeof(int), 1, file);
+    fwrite(players, sizeof(Player), playerCount, file);
+    fclose(file);
+
+    printf("Datas saved successfully!\n");
+}
+
 int main() {
     Player players[MAX_PLAYERS];
     int playerCount = 0;
