@@ -66,7 +66,7 @@ int main() {
             case 1: {
                 printf("\nSaved Players\n");
                 for (int i = 0; i < playerCount; i++) {
-                    printf("[%d] %s (%d measurement)", i, players[i].name, players[i].scoreCount);
+                    printf("[%d] %s (%d measurement)\n", i, players[i].name, players[i].scoreCount);
                 }
                 printf("Select player (write last player index + 1 to create): ");
 
@@ -90,6 +90,20 @@ int main() {
                 break;
             }
             case 3: {
+                if (activePlayerIndex == -1) {
+                    printf("No active player!\n");
+                    break;
+                }
+                Player *p = &players[activePlayerIndex];
+                printf("\n--- %s results ---\n", p->name);
+                for (int i = 0; i < p->scoreCount; i++) {
+                    time_t t = p->history[i].timestamp;
+                    struct tm *tm_info = localtime(&t);
+                    char timeBuffer[26];
+                    strftime(timeBuffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+
+                    printf("%d. Time: %lu ms (%s)\n", i + 1, p->history[i].reactionTime, timeBuffer);
+                }
                 break;
             }
             case 4: {
